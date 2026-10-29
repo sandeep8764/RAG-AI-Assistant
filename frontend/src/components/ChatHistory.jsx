@@ -1,0 +1,84 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { getSessions, deleteSession } from '../services/api';
+import { TrashIcon } from '@phosphor-icons/react';
+
+const ChatHistory = ({ currentSessionId, onSelectSession, refreshTrigger }) => {
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [refreshTrigger]);
+
+  const fetchSessions = async () => {
+    // Show cached data instantly (already in state via useState initializer)
+    // Fetch fresh data in background
+    try {
+      const data = await getSessions();
+      setSessions(data || []);
+    } catch (err) {
+      console.error('Failed to fetch sessions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (e, sessionId) => {
+    e.stopPropagation();
+    if (!confirm('Are you sure you want to delete this chat history?')) return;
+    try {
+      await deleteSession(sessionId);
+      if (currentSessionId === sessionId) {
+        onSelectSession(null);
+      }
+      fetchSessions();
+    } catch (err) {
+      alert('Failed to delete session');
+    }
+  };
+
+  if (loading && sessions.length === 0) {
+    return <div className="text-xs px-2 py-4" style={{ color: 'var(--text-muted)' }}>Loading history...</div>;
+  }
+
+  if (sessions.length === 0) {
+    return <div className="text-xs px-2 py-4" style={{ color: 'var(--text-muted)' }}>No recent chats</div>;
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      {sessions.map(session => {
+        const isActive = session._id === currentSessionId;
+        return (
+          <div
+            key={session._id}
+            onClick={() => onSelectSession(session._id)}
+            className={`group flex items-center justify-between px-3 py-1 rounded-[20px] cursor-pointer transition-colors ${
+              isActive ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400' : 'hover:bg-black/5 dark:hover:bg-white/5'
+            }`}
+            style={!isActive ? { color: 'var(--text-secondary)' } : {}}
+          >
+            <div className="flex items-center gap-2 overflow-hidden">
+              <span className="text-sm font-medium truncate">
+                {session.title ? session.title.charAt(0).toUpperCase() + session.title.slice(1) : ''}
+              </span>
+            </div>
+            
+            <button
+              onClick={(e) => handleDelete(e, session._id)}
+              className={`p-1 ml-4 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20 hover:text-red-400 ${
+                isActive ? 'opacity-100' : ''
+              }`}
+            >
+              <TrashIcon size={18} className='text-red-500'/>
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default ChatHistory;
