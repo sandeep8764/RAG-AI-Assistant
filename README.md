@@ -1,20 +1,15 @@
-# 🧙 Master — RAG AI Document Assistant
+# 🧙 Maester — RAG AI Document Assistant
 
-An AI-powered document-based chat application built using **Retrieval-Augmented Generation (RAG)**. Upload your documents, ask questions in natural language, and receive intelligent, context-aware answers grounded in your uploaded files.
+An AI-powered document assistant built using **Retrieval-Augmented Generation (RAG)** that allows users to upload documents, ask questions in natural language, and receive context-aware answers grounded in their uploaded files.
 
-Maester combines semantic search, vector embeddings, and Large Language Models (LLMs) to make document interaction easier, faster, and more intelligent.
-
-![Maester RAG Interface](frontend/public/home.png)
-
----
-
-## ✨ Features
+## Features
 
 - **📄 Document Q&A** — Upload and interact with PDF, DOCX, Excel, TXT, CSV, and JSON files.
 - **🔐 User Authentication** — Secure registration and login using JWT authentication and bcrypt password hashing.
 - **💬 Persistent Chat History** — Save, access, and resume previous conversations across sessions.
 - **🧠 Conversation Memory** — Summary-based memory allows the LLM to retain context from previous interactions.
 - **📁 Selective File Context** — Choose specific uploaded documents to use as context for individual queries.
+- **☁️ Cloud File Storage** — Store and download original uploaded documents directly through AWS S3.
 - **🔎 Semantic Search** — Retrieve relevant document chunks using MongoDB Atlas Vector Search.
 - **📚 Source Citations** — Display the document chunks used to generate answers, along with confidence scores.
 - **🎯 Intent Detection** — Distinguish between general conversations and document-related queries to route requests appropriately.
@@ -23,7 +18,7 @@ Maester combines semantic search, vector embeddings, and Large Language Models (
 
 ## 🏗️ System Architecture
 
-Maester follows a modular client-server architecture where the React frontend communicates with a FastAPI backend. The backend coordinates authentication, document processing, semantic retrieval, LLM responses, and database storage.
+Maester follows a modular client-server architecture where the React frontend communicates with a FastAPI backend. The backend coordinates authentication, document processing, semantic retrieval, LLM responses, and cloud storage.
 
 ```mermaid
 flowchart TB
@@ -52,8 +47,9 @@ flowchart TB
         LLM["Groq API<br/>Llama 3.1"]
     end
 
-    subgraph STORAGE["Database Layer"]
-        MONGO["MongoDB Atlas<br/>Users, Chats, Documents, Vectors"]
+    subgraph STORAGE["Cloud Storage"]
+        MONGO["MongoDB Atlas<br/>Users, Chats, Metadata"]
+        S3["AWS S3<br/>Original Documents"]
     end
 
     U --> UI
@@ -71,6 +67,7 @@ flowchart TB
 
     PROCESS --> EMB
     EMB --> VECTOR
+    PROCESS --> S3
     API --> MONGO
 
     INTENT --> MEMORY
@@ -101,8 +98,11 @@ flowchart TD
     B --> C["Extract Text"]
     C --> D["Text Chunking"]
     D --> E["Generate Embeddings"]
-    E --> F["Store Vectors and Metadata in MongoDB Atlas"]
-    F --> G["Document Ready for Q&A"]
+    E --> F["Store Vectors in MongoDB Atlas"]
+    A --> G["Store Original File in AWS S3"]
+
+    F --> H["Document Ready for Q&A"]
+    G --> H
 ```
 
 ### 2. Question Answering Pipeline
@@ -156,6 +156,7 @@ flowchart TD
 | Embedding Model | all-MiniLM-L6-v2 |
 | LLM | Llama 3.1 via Groq API |
 | Authentication | JWT, bcrypt |
+| Deployment | AWS Lambda (Docker), Vercel |
 
 ---
 
@@ -167,6 +168,7 @@ Maester/
 ├── backend/
 │   ├── main.py
 │   ├── requirements.txt
+│   ├── deploy-lambda.ps1
 │   └── ...
 │
 ├── frontend/
@@ -192,13 +194,14 @@ Follow these steps to run Maester locally.
 - Node.js and npm
 - MongoDB Atlas account
 - Groq API key
+- AWS account and S3 bucket
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/sandeep8764/RAG-AI-Assistant.git
+git clone https://github.com/YOUR_USERNAME/maester-rag-ai-assistant.git
 
-cd RAG-AI-Assistant
+cd maester-rag-ai-assistant
 ```
 
 ### 2. Backend Setup
@@ -247,6 +250,72 @@ GROQ_API_KEY=your_groq_api_key
 MONGODB_URI=your_mongodb_connection_string
 
 JWT_SECRET=your_jwt_secret
+
+AWS_REGION=ap-south-1
+
+S3_BUCKET=your_s3_bucket_name
 ```
 
-**
+**Important:** Never commit API keys, database credentials, JWT secrets, or AWS credentials to GitHub.
+
+---
+
+## ☁️ Deployment
+
+Maester uses Docker-based AWS Lambda deployment for the backend and Vercel for the frontend.
+
+### Backend Deployment
+
+```powershell
+cd backend
+
+.\deploy-lambda.ps1
+```
+
+### Frontend Deployment
+
+Deploy the frontend through Vercel and configure the production API URL using the `VITE_API_URL` environment variable.
+
+---
+
+## 🎯 Key Concepts Demonstrated
+
+- Retrieval-Augmented Generation (RAG)
+- Large Language Models (LLMs)
+- Natural Language Processing (NLP)
+- Text Extraction and Chunking
+- Semantic Search and Vector Embeddings
+- MongoDB Atlas Vector Search
+- Prompt Engineering
+- Conversation Memory Management
+- REST API Development
+- JWT Authentication and Authorization
+- Cloud Storage with AWS S3
+- Docker and Serverless Deployment
+
+---
+
+## 🔮 Future Enhancements
+
+- Streaming LLM responses for real-time interaction.
+- Hybrid Search combining keyword and semantic retrieval.
+- Reranking retrieved chunks for improved relevance.
+- Support for additional document formats.
+- Advanced document analytics and visualization.
+- Multi-document comparison and summarization.
+
+---
+
+## 👨‍💻 Author
+
+**Sandeep Kumar**
+
+B.Tech | Electronics and Communication Engineering  
+National Institute of Technology, Delhi
+
+- GitHub: [@sandeep8764](https://github.com/sandeep8764)
+- LinkedIn: [Sandeep Kumar](https://www.linkedin.com/in/sandeepkumar8764/)
+
+---
+
+⭐ If you find Maester interesting, consider giving the repository a star!
