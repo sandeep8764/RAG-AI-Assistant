@@ -1,4 +1,4 @@
-# 🧙 Maester — RAG AI Document Assistant
+# 🧙 MASTER — RAG AI Document Assistant
 
 An AI-powered document assistant built using **Retrieval-Augmented Generation (RAG)** that allows users to upload documents, ask questions in natural language, and receive context-aware answers grounded in their uploaded files.
 
@@ -156,7 +156,7 @@ flowchart TD
 | Embedding Model | all-MiniLM-L6-v2 |
 | LLM | Llama 3.1 via Groq API |
 | Authentication | JWT, bcrypt |
-| Deployment | AWS Lambda (Docker), Vercel |
+
 
 ---
 
@@ -168,7 +168,7 @@ Maester/
 ├── backend/
 │   ├── main.py
 │   ├── requirements.txt
-│   ├── deploy-lambda.ps1
+│   ├── ...
 │   └── ...
 │
 ├── frontend/
@@ -194,14 +194,14 @@ Follow these steps to run Maester locally.
 - Node.js and npm
 - MongoDB Atlas account
 - Groq API key
-- AWS account and S3 bucket
+
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/maester-rag-ai-assistant.git
+git clone https://github.com/YOUR_USERNAME/master-rag-ai-assistant.git
 
-cd maester-rag-ai-assistant
+cd master-rag-ai-assistant
 ```
 
 ### 2. Backend Setup
@@ -251,30 +251,14 @@ MONGODB_URI=your_mongodb_connection_string
 
 JWT_SECRET=your_jwt_secret
 
-AWS_REGION=ap-south-1
 
-S3_BUCKET=your_s3_bucket_name
 ```
 
 **Important:** Never commit API keys, database credentials, JWT secrets, or AWS credentials to GitHub.
 
 ---
 
-## ☁️ Deployment
 
-Maester uses Docker-based AWS Lambda deployment for the backend and Vercel for the frontend.
-
-### Backend Deployment
-
-```powershell
-cd backend
-
-.\deploy-lambda.ps1
-```
-
-### Frontend Deployment
-
-Deploy the frontend through Vercel and configure the production API URL using the `VITE_API_URL` environment variable.
 
 ---
 
@@ -318,4 +302,4 @@ National Institute of Technology, Delhi
 
 ---
 
-⭐ If you find Maester interesting, consider giving the repository a star!
+⭐ If you find Master interesting, consider giving the repository a star!
